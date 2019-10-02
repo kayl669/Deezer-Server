@@ -16,8 +16,8 @@ $(document).ready(function(){
 	//Init Deezer Player
 	window.dzAsyncInit = function() {
 		DZ.init({
-			appId  : '123456', //Your app id
-			channelUrl : 'http://'+window.location.host,
+			appId  : '262202', //Your app id
+			channelUrl : 'http://192.168.1.27:4000/channel',
 			player : {
 				onload: deezerReady
 			}
@@ -25,7 +25,7 @@ $(document).ready(function(){
 	  };
 	(function() {
 		var e = document.createElement('script');
-		e.src = 'http://cdn-files.deezer.com/js/min/dz.js';
+		e.src = 'https://e-cdns-files.dzcdn.net/js/min/dz.js';
 		e.async = true;
 		document.getElementById('dz-root').appendChild(e);
 	}());
@@ -35,7 +35,7 @@ $(document).ready(function(){
 	 * deezerReady method
 	 *
 	 * Deezer is loaded, time to log and open a socketIO connection
-	 * 
+	 *
 	 * @return void
 	 */
 	function deezerReady () {
@@ -52,7 +52,7 @@ $(document).ready(function(){
 
 
 				//Connect to the server
-				socket = io.connect('http://'+window.location.host);
+				socket = io.connect('http://192.168.1.27:4000/');
 
 				var self = 0;
 
@@ -74,16 +74,16 @@ $(document).ready(function(){
 
 
 				//@see main.js
-				app(); 
+				app();
 
 
 		    } else { // User cancelled login or did not fully authorize
 				flash("You have to be connected to Deezer to use the app. Please reload the page.", "red")
 		    }
-		}, 
+		},
 		{
 			//All the perms
-			perms: ['basic_access','email','offline_access','manage_library','manage_community','delete_library','listening_history'] 
+			perms: ['basic_access','email','offline_access','manage_library','manage_community','delete_library','listening_history']
 		});
 
 	}
