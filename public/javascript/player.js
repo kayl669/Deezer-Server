@@ -11,17 +11,20 @@
  * 5- start to wait to track to play
  */
 
-
-
+let appId = '262202';
+let server = 'http://item-ax31503:4000';
+// let appId = '376184';
+// let server = 'http://alarmClock:4000';
+// let appId = '399804';
+// let server = 'http://alarmJeff:4000';
 
 $(document).ready(function() {
 
     //Init Deezer Player
     window.dzAsyncInit = function() {
-        console.log("Init");
         DZ.init({
-            appId:      '262202', //Your app id
-            channelUrl: 'http://192.168.1.27:4000/channel',
+            appId:      appId, //Your app id
+            channelUrl: server + '/remote/channel.html',
             player:     {
                 onload: deezerReady
             }
@@ -32,7 +35,6 @@ $(document).ready(function() {
         e.src = 'https://e-cdns-files.dzcdn.net/js/min/dz.js';
         e.async = true;
         document.getElementById('dz-root').appendChild(e);
-        console.log('Script');
     }());
 
     /**
@@ -44,7 +46,7 @@ $(document).ready(function() {
      */
     function deezerReady() {
 
-        DZ.login(function(response)  //Will prompt a new widnow asking the user to connect with his deezer account
+        DZ.login(function(response)  //Will prompt a new window asking the user to connect with his deezer account
         {
             if (response.authResponse) //User connected
             {
@@ -55,7 +57,7 @@ $(document).ready(function() {
                 $('div.infosbox li.deezer li span').removeClass('label-important').addClass('label-success');
 
                 //Connect to the server
-                socket = io.connect('http://192.168.1.27:4000/');
+                socket = io.connect(server);
 
                 var self = 0;
 

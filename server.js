@@ -13,38 +13,49 @@
 
 
 
-var express = require('express'), app = express(), server = require('http').createServer(app), io = require('socket.io').listen(server), hbs = require('hbs');
+const express = require('express');
+const app = express();
+const server = require('http').createServer(app).listen(4000);
+const io = require('socket.io').listen(server);
+const hbs = require('hbs');
+const cors = require('cors');
+const moment = require('moment');
+const path = require('path');
+const serveStatic = require('serve-static');
 
-/**
- * Init Express
- */
+console.log(moment().add(1, 'y').format("ddd, DD MMM YYYY HH:mm:ss G\\MT"));
 
+app.use(cors({
+    origin: true
+}));
 app.set('views', __dirname + '/views');
 app.set('view engine', 'html');
 app.engine('html', hbs.__express);
 
-app.use(express.static('public'));
+app.use(function(request, response, next) {
+    if (request.headers.origin) {
+        response.header('Access-Control-Allow-Origin', request.headers.origin);
+    }
+    else {
+        response.header('Access-Control-Allow-Origin', '*');
+    }
+    response.setHeader("Access-Control-Allow-Credentials", "true");
+    response.setHeader('Access-Control-Allow-Methods', `GET, POST, DELETE, PUT`);
+    response.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    let cache_expire = 60 * 60 * 24 * 365;
+    response.setHeader('Pragma', 'public');
+    response.setHeader('Cache-Control', 'maxage=' + cache_expire);
+    response.setHeader('Expires', moment().add(1, 'y').format("ddd, DD MMM YYYY HH:mm:ss G\\MT"));
+    next();
+});
 
 //A remote
-app.get('/', function(req, res) {
+app.use('/remote', serveStatic(path.join(__dirname, 'public')));
+app.get('/remote', function(req, res) {
     res.render('index', {title: "Home"});
 });
 
-//A player
-app.get('/player', function(req, res) {
-    res.render('player', {title: "Player"});
-});
-
-app.get('/channel', function(req, res) {
-    let cache_expire = 60 * 60 * 24 * 365;
-    res.set('Pragma', 'public');
-    res.set('Cache-Control', 'maxage=' + cache_expire);
-    res.set('Expires', 'Fri, 02 Oct 2020 00:00:00 GMT');
-    console.log('Coucou');
-    res.send('<script src="https://e-cdns-files.dzcdn.net/js/min/dz.js"></script>');
-});
-
-server.listen(4000);
+app.use(serveStatic(path.join(__dirname, '../clockOS-ui/dist')));
 
 //Init
 var allClients = 0,  //number of client
@@ -54,19 +65,19 @@ var allClients = 0,  //number of client
 
 var volume = parseInt(50), //default to 50%
     musicStatus = "stop", musicPosition = 0, musicMode = "tracks" // "Tracks" or "Radio"
-queue = [], //Tracks to play
+var queue = [], //Tracks to play
     history = []; //Tracks already played
 
 /**
  * A new connection
  */
 io.sockets.on('connection', function(client) {
-
+    console.log("New client");
     //The client
     var my_client = {
         "id":     clientId,
         "obj":    client,
-        "statut": null
+        "status": null
     };
 
     //Upload the stats
@@ -74,7 +85,7 @@ io.sockets.on('connection', function(client) {
     allClients += 1;
 
     //Debug
-    console.log("Cliend " + my_client.id + " connected.");
+    console.log("Client " + my_client.id + " connected.");
 
     //Return "connected" to the client
     client.emit('connected', //the client id and status
@@ -94,7 +105,7 @@ io.sockets.on('connection', function(client) {
                 remotes.push(my_client.id); //Update the list
             }
 
-            my_client.statut = status;
+            my_client.status = status;
 
             //debug
             console.log("Client " + my_client.id + " identified as " + status + ".");
@@ -137,7 +148,7 @@ io.sockets.on('connection', function(client) {
             queue.splice(0, 1);
         }
 
-        //We push the new tracks a the beggining of the queue
+        //We push the new tracks a the begining of the queue
         queue = tracks.concat(queue);
 
         //We send the first track

@@ -24,7 +24,7 @@
  */
 $(document).ready(function() {
 	flasher = $('div.flash'); //Flash infos @see flash()
-	
+
 	history : []; //Tracks already played
 	queue = []; //Tracks to play
 });
@@ -43,7 +43,7 @@ $(document).ready(function() {
  *  - music status (playing, pause, stop)
  *  - List of players
  *  - List of remotes
- * 
+ *
  * @return void
  */
 function general() {
@@ -64,7 +64,7 @@ function general() {
 						$('div.queue ul.container').append(
 							'<li class="block history">'+
 								'<strong>'+response.title+' </strong>  ' + response.artist.name + ' - ' + response.album.title +
-							
+
 								'<div class="btn-group">'+
 									'<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">'+
 								    	'Actions <span class="caret"></span>'+
@@ -159,7 +159,9 @@ function general() {
 		if((data.musicStatus == "playing" || data.musicStatus == "pause") && data.queue[0]) {
 			DZ.api('/track/'+data.queue[0], function(response)
 			{
-				$('div.music li.current').html('<strong>'+response.title+' </strong>  '+response.artist.name+' - '+response.album.title);
+                $('div.music li.current').html(
+                    '<img src="' + response.album.cover_small + '"/><strong>' + response.title + ' </strong>  ' + response.artist.name + ' - '
+                    + response.album.title);
 			});
 		} else {
 			$('div.music li.current').html("No track");
@@ -204,14 +206,11 @@ function general() {
 		}
 	});
 
-
-
-
-	//Listen to socketIO 
+    //Listen to socketIO
 
 	socket.on('infos', function(data){
 		updateInfos(data);
-	});	
+    });
 
 	socket.on('musicPosition', function(position){
 		updatePosition(position)
@@ -233,12 +232,12 @@ function general() {
  * 		- prev/next
  * 		- play/pause
  * 		- volume up/down
- * 	
+ *
  * - for Deezer (api) :
  * 		- search for a track
  * 		- show an album, an artist, a playlist
  * 		- add/remove to favorites
- * 
+ *
  * @return void
  */
 function commands() {
@@ -328,7 +327,7 @@ function commands() {
 					socket.emit(type);
 				break;
 		}
-		
+
 	});
 
 
@@ -347,8 +346,8 @@ function commands() {
 		switch(type) {
 
 			//Add a track, an album, a playlist, an artist, a radio to favorites
-			
-			case 'addFavorites' : 
+
+            case 'addFavorites' :
 				DZ.api('/user/me/tracks/?track_id='+obj, 'POST', function(response)
 				{
 					if(response) flash("New Favorite !", 'green');
@@ -356,7 +355,7 @@ function commands() {
 				});
 				break;
 
-			case 'addFavoritesAlbum' : 
+            case 'addFavoritesAlbum' :
 				DZ.api('/user/me/albums/?album_id='+obj, 'POST', function(response)
 				{
 					if(response) flash("New Favorite !", 'green');
@@ -364,14 +363,14 @@ function commands() {
 				});
 				break;
 
-			case 'addFavoritesArtist' : 
+            case 'addFavoritesArtist' :
 				DZ.api('/user/me/artists/?artist_id='+obj, 'POST', function(response)
 				{
 					if(response) flash("New Favorite !", 'green');
 					else flash('Error', 'red');
 				});
 				break;
-			case 'addFavoritesRadios' : 
+            case 'addFavoritesRadios' :
 				DZ.api('/user/me/radios/?radio_id='+obj, 'POST', function(response)
 				{
 					if(response) flash("New Favorite !", 'green');
@@ -389,7 +388,7 @@ function commands() {
 				});
 				break;
 
-			case 'removeFavoritesAlbum' : 
+            case 'removeFavoritesAlbum' :
 				DZ.api('/user/me/albums/?album_id='+obj, 'DELETE', function(response)
 				{
 					if(response) flash("Favorite deleted", 'green');
@@ -397,14 +396,14 @@ function commands() {
 				});
 				break;
 
-			case 'removeFavoritesArtist' : 
+            case 'removeFavoritesArtist' :
 				DZ.api('/user/me/artists/?artist_id='+obj, 'DELETE', function(response)
 				{
 					if(response) flash("Favorite deleted", 'green');
 					else flash('Error', 'red');
 				});
 				break;
-			case 'removeFavoritesRadios' : 
+            case 'removeFavoritesRadios' :
 				DZ.api('/user/me/radios/?radio_id='+obj, 'DELETE', function(response)
 				{
 					if(response) flash("Favorite deleted", 'green');
@@ -421,7 +420,7 @@ function commands() {
 
 			default : break;
 		}
-		
+
 	});
 
 
@@ -453,7 +452,7 @@ function commands() {
 			//Show album, artist, playlist, radio
 			case 'album'    :
 			case 'artist'   :
-			case 'playlist' : 
+            case 'playlist' :
 			case 'radio'    :
 				url = '/'+action+'/'+val;
 				break;
@@ -464,7 +463,7 @@ function commands() {
 				break;
 
 			//Search
-			default: 
+            default:
 				url = '/search/?q='+val;
 				break;
 
@@ -651,7 +650,7 @@ function commands() {
 
 					if(artist.radio)
 						$('h1.title div').append('<button class="btn btn-primary command" data-type="smartRadio" data-obj="'+artist.id+'">SmartRadio</button>');
-					
+
 					$('div.content').append(
 						'<h2>Albums</h2>'+
 						'<table class="table table-striped">'+
@@ -747,7 +746,7 @@ function commands() {
 				if(!next) {
 					$('h1.title').html("Albums");
 
-					
+
 					$('div.content').append(
 						'<table class="table table-striped">'+
 							'<thead>'+
@@ -884,10 +883,10 @@ function commands() {
 
 
 			//What rendering to choose ?
-			
+
 			function echoResponse (response) {
 				switch(action) {
-					case 'album' : 
+                    case 'album' :
 						albumResponse(response);
 						break;
 					case 'artist' :
@@ -904,19 +903,19 @@ function commands() {
 						break;
 					case 'user' :
 						switch(val) {
-							case 'tracks': 
+                            case 'tracks':
 								tracksResponse(response.data);
 								break;
-							case 'albums': 
+                            case 'albums':
 								albumsResponse(response.data);
 								break;
-							case 'playlists': 
+                            case 'playlists':
 								playlistsResponse(response.data);
 								break;
-							case 'radios': 
+                            case 'radios':
 								radiosResponse(response.data);
 								break;
-							case 'artists': 
+                            case 'artists':
 								artistsResponse(response.data);
 								break;
 						}
@@ -932,20 +931,20 @@ function commands() {
 			/**
 			 * Next page
 			 */
-			
-			//If deezer return a next url, show me a button "Next"
+
+            //If deezer return a next url, show me a button "Next"
 			if(typeof response.next != 'undefined') {
 				$('div.content table').after('<button class="btn btn-primary next">Next</button>');
 				next = response.next; //the url to call
 			}
 
 			//User wants more
-			$('div.content button.next').click(function() 
+            $('div.content button.next').click(function()
 			{
 				//We ask for more
 				$.getJSON(next+"&callback=?", function(response){
-					
-					echoResponse(response); //We return the result
+
+                    echoResponse(response); //We return the result
 
 					//If next url
 					if(typeof response.next != 'undefined')

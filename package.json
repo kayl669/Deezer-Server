@@ -1,10 +1,20 @@
 {
-   "name": "deezer",
-   "description": "Deezer serveur",
-   "version": "0.0.1",
-   "dependencies": {
-      "express"   : "3.x",
-      "hbs"       : "*",
-      "socket.io" : "0.9.*"
+    "name": "deezer",
+    "description": "Deezer serveur",
+    "version": "0.0.1",
+    "main": "main.js",
+    "dependencies": {
+        "cors": "^2.8.5",
+        "electron": "^8.1.1",
+        "express": "^4.17.1",
+        "express-urlrewrite": "^1.2.0",
+        "hbs": "*",
+        "moment": "^2.24.0",
+        "serve-static": "^1.14.1",
+        "socket.io": "^2.3.0",
+        "socket.io-client": "^2.3.0"
+    },
+    "scripts": {
+        "start-electron": "electron . --disable-gpu"
     }
 }

@@ -8,84 +8,84 @@
  * 4- start to listen for user actions
  */
 
+    // let appId = '262202';
+    // let server = 'http://item-ax31503:4000';
+    // let appId = '376184';
+    // let server = 'http://alarmClock:4000';
+let appId = '399804';
+let server = 'http://alarmJeff:4000';
 
+$(document).ready(function() {
 
+    //Init Deezer Player
+    window.dzAsyncInit = function() {
+        DZ.init({
+            appId:      appId, //Your app id
+            channelUrl: server + '/remote/channel.html',
+            player:     {
+                onload: deezerReady
+            }
+        });
+    };
+    (function() {
+        var e = document.createElement('script');
+        e.src = 'https://e-cdns-files.dzcdn.net/js/min/dz.js';
+        e.async = true;
+        document.getElementById('dz-root').appendChild(e);
+    }());
 
-$(document).ready(function(){
+    /**
+     * deezerReady method
+     *
+     * Deezer is loaded, time to log and open a socketIO connection
+     *
+     * @return void
+     */
+    function deezerReady() {
 
-	//Init Deezer Player
-	window.dzAsyncInit = function() {
-		DZ.init({
-			appId  : '262202', //Your app id
-			channelUrl : 'http://192.168.1.27:4000/channel',
-			player : {
-				onload: deezerReady
-			}
-		});
-	  };
-	(function() {
-		var e = document.createElement('script');
-		e.src = 'https://e-cdns-files.dzcdn.net/js/min/dz.js';
-		e.async = true;
-		document.getElementById('dz-root').appendChild(e);
-	}());
+        DZ.login(function(response)  //Will prompt a new window asking the user to connect with his deezer account
+        {
+            if (response.authResponse) //User connected
+            {
+                flash('Connected', 'green'); //Cool
 
+                //Update Deezer status
+                $('div.infosbox li.deezer li span').text('Connected');
+                $('div.infosbox li.deezer li span').removeClass('label-important').addClass('label-success');
 
-	/**
-	 * deezerReady method
-	 *
-	 * Deezer is loaded, time to log and open a socketIO connection
-	 *
-	 * @return void
-	 */
-	function deezerReady () {
+                //Connect to the server
+                socket = io.connect(server);
 
-		DZ.login(function(response)  //Will prompt a new widnow asking the user to connect with his deezer account
-		{
-		    if (response.authResponse) //User connected
-		    {
-				flash('Connected', 'green'); //Cool
+                var self = 0;
 
-				//Update Deezer status
-				$('div.infosbox li.deezer li span').text('Connected');
-				$('div.infosbox li.deezer li span').removeClass('label-important').addClass('label-success');
+                //When connected
+                socket.on('connected', function(data, identification) {
 
+                    self = data.clientId;
 
-				//Connect to the server
-				socket = io.connect('http://192.168.1.27:4000/');
+                    //Update informations
+                    $('div.infosbox li.connection li:first-child span').text(self); //my id
+                    $('div.infosbox li.connection li:nth-child(2) span').text(data.msg);
+                    if (data.msg == 'Connected') {
+                        $('div.infosbox li.connection li:nth-child(2) span').removeClass('label-important').addClass('label-success');
+                    }
 
-				var self = 0;
+                    //Identification as a remote
+                    identification('remote');
+                });
 
-				//When connected
-				socket.on('connected', function(data, identification){
+                //@see main.js
+                app();
 
-					self = data.clientId;
+            }
+            else { // User cancelled login or did not fully authorize
+                flash("You have to be connected to Deezer to use the app. Please reload the page.", "red")
+            }
+        }, {
+            //All the perms
+            perms: ['basic_access', 'email', 'offline_access', 'manage_library', 'manage_community', 'delete_library', 'listening_history']
+        });
 
-					//Update informations
-					$('div.infosbox li.connection li:first-child span').text(self); //my id
-					$('div.infosbox li.connection li:nth-child(2) span').text(data.msg);
-					if(data.msg == 'Connected')
-						$('div.infosbox li.connection li:nth-child(2) span').removeClass('label-important').addClass('label-success');
-
-					//Identification as a remote
-					identification('remote');
-				});
-
-
-
-				//@see main.js
-				app();
-
-
-		    } else { // User cancelled login or did not fully authorize
-				flash("You have to be connected to Deezer to use the app. Please reload the page.", "red")
-		    }
-		},
-		{
-			//All the perms
-			perms: ['basic_access','email','offline_access','manage_library','manage_community','delete_library','listening_history']
-		});
-
-	}
+    }
 
 });
