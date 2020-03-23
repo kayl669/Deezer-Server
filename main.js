@@ -32,7 +32,7 @@ function createWindow() {
 
         var os = require("os");
         // and load the index.html of the app.
-        mainWindow.loadURL('http://' + os.hostname() + ':4000/#');
+        mainWindow.loadURL('http://' + os.hostname().toLowerCase() + ':4000/#');
 
         // Open the DevTools.
         // mainWindow.webContents.openDevTools();

@@ -24,7 +24,7 @@ $(document).ready(function() {
     window.dzAsyncInit = function() {
         DZ.init({
             appId:      appId, //Your app id
-            channelUrl: server + '/remote/channel.html',
+            channelUrl: server + '/channel.html',
             player:     {
                 onload: deezerReady
             }

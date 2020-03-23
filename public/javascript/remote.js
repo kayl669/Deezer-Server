@@ -8,12 +8,12 @@
  * 4- start to listen for user actions
  */
 
-    // let appId = '262202';
-    // let server = 'http://item-ax31503:4000';
-    // let appId = '376184';
-    // let server = 'http://alarmClock:4000';
-let appId = '399804';
-let server = 'http://alarmJeff:4000';
+let appId = '262202';
+let server = 'http://item-ax31503:4000';
+// let appId = '376184';
+// let server = 'http://alarmClock:4000';
+// let appId = '399804';
+// let server = 'http://alarmJeff:4000';
 
 $(document).ready(function() {
 
@@ -21,7 +21,7 @@ $(document).ready(function() {
     window.dzAsyncInit = function() {
         DZ.init({
             appId:      appId, //Your app id
-            channelUrl: server + '/remote/channel.html',
+            channelUrl: server + '/channel.html',
             player:     {
                 onload: deezerReady
             }
